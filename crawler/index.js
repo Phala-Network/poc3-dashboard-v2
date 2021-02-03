@@ -23,7 +23,7 @@ globalThis.$logger = createLogger({
   name: 'dashboard'
 })
 
-let jsonOutput = '{}'
+let jsonOutput = 'null'
 
 const main = async () => {
   const provider = new WsProvider(WS_ENDPOINT)
@@ -104,7 +104,7 @@ const processRoundAt = async (header, roundNumber, api) => {
         payoutAccounts[account] = {
           ...payoutAccounts[account],
           fire2,
-          fire2Human: value.toHuman().replace(/Unit$/, ''),
+          fire2Human: value.toHuman().replace(/Unit$/, '').replace(' ', ''),
           prizeRatio: new Demical(fire2).div(accumulatedFire2Demical).toNumber(),
           workerCount: 0
         }
@@ -155,7 +155,7 @@ const processRoundAt = async (header, roundNumber, api) => {
     const valueDemical = new Demical(value.toString())
 
     payoutAccounts[k].stake = value.toString()
-    payoutAccounts[k].stakeHuman = api.createType('BalanceOf', payoutAccounts[k].stake).toHuman().replace(/Unit$/, '').trim()
+    payoutAccounts[k].stakeHuman = api.createType('BalanceOf', payoutAccounts[k].stake).toHuman().replace(/Unit$/, '').replace(' ', '').trim()
     payoutAccounts[k].stakeRatio = valueDemical.div(accumulatedStakeDemical).toNumber()
   })
 
@@ -166,7 +166,7 @@ const processRoundAt = async (header, roundNumber, api) => {
     onlineWorkers: onlineWorkers.toString(),
     totalPower: totalPower.toString(),
     accumulatedStake: accumulatedStake.toString(),
-    accumulatedStakeHuman: api.createType('BalanceOf', accumulatedStake).toHuman().replace(/Unit$/, '').trim(),
+    accumulatedStakeHuman: api.createType('BalanceOf', accumulatedStake).toHuman().replace(/Unit$/, '').replace(' ', '').trim(),
     stashAccounts: validStashAccounts,
     payoutAccounts
   }
