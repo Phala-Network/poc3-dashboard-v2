@@ -1,0 +1,23 @@
+{
+  "name": "@phala/dashboard-crawler",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@polkadot/api": "^3.4.1",
+    "@polkadot/keyring": "^5.2.3",
+    "@polkadot/ui-keyring": "^0.65.1",
+    "bunyan": "^1.8.15",
+    "byte-base64": "^1.1.0",
+    "decimal.js": "^10.2.1",
+    "finity": "^0.5.4",
+    "ioredis": "^4.19.4",
+    "koa": "^2.13.1",
+    "p-queue": "^6.6.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node --experimental-json-modules --es-module-specifier-resolution=node --harmony-top-level-await --no-warnings ./index.js"
+  }
+}
