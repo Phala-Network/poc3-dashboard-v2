@@ -77,7 +77,7 @@ const main = async () => {
 const processRoundAt = async (header, roundNumber, api) => {
   const blockHash = header.hash
 
-  const accumulatedFire2 = await api.query.phalaModule.accumulatedFire2.at(blockHash)
+  const accumulatedFire2 = (await api.query.phalaModule.accumulatedFire2.at(blockHash)) || new BN('0')
   const accumulatedFire2Demical = new Demical(accumulatedFire2.toString())
   const onlineWorkers = await api.query.phalaModule.onlineWorkers.at(blockHash)
   const totalPower = await api.query.phalaModule.totalPower.at(blockHash)
@@ -121,9 +121,12 @@ const processRoundAt = async (header, roundNumber, api) => {
         if (typeof value.state.Mining === 'undefined') { return }
 
         validStashAccounts[stash] = stashAccounts[stash]
-        payoutAccounts[payout] = {
-          ...payoutAccounts[payout],
-          workerCount: payoutAccounts[payout].workerCount + 1
+
+        if (payoutAccounts[payout]) {
+          payoutAccounts[payout] = {
+            ...payoutAccounts[payout],
+            workerCount: payoutAccounts[payout].workerCount + 1
+          }
         }
       }))
 
@@ -149,6 +152,7 @@ const processRoundAt = async (header, roundNumber, api) => {
       })
   )
 
+  accumulatedStake = accumulatedStake || new BN('0')
   const accumulatedStakeDemical = new Demical(accumulatedStake.toString())
   Object.entries(payoutAccounts).forEach(([k, v]) => {
     const value = payoutAccounts[k].stake
