@@ -139,7 +139,8 @@ const processRoundAt = async (header, roundNumber, api) => {
 
         if (!stashAccount) { return }
 
-        const value = (await api.rpc.state.getStorage(k, blockHash)).div(ONE_THOUSAND)
+        // const value = (await api.rpc.state.getStorage(k, blockHash)).div(ONE_THOUSAND)
+        const value = (await api.rpc.state.getStorage(k, blockHash))
         accumulatedStake = typeof accumulatedStake === 'undefined'
           ? value : accumulatedStake.add(value)
 
