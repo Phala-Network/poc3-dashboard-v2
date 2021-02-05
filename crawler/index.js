@@ -155,7 +155,7 @@ const processRoundAt = async (header, roundNumber, api) => {
   accumulatedStake = accumulatedStake || new BN('0')
   const accumulatedStakeDemical = new Demical(accumulatedStake.toString())
   Object.entries(payoutAccounts).forEach(([k, v]) => {
-    const value = payoutAccounts[k].stake
+    const value = payoutAccounts[k].stake || new BN('0')
     const valueDemical = new Demical(value.toString())
 
     payoutAccounts[k].stake = value.toString()
