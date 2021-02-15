@@ -149,7 +149,7 @@ const processRoundAt = async (header, roundNumber, api) => {
 
         if (!payoutAccount) { return }
 
-        payoutAccount.stake = typeof payoutAccount.stake ? value : value.add(value)
+        payoutAccount.stake = typeof payoutAccount.stake === 'undefined' ? value : value.add(value)
       })
   )
 
