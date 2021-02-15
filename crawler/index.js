@@ -106,9 +106,25 @@ const processRoundAt = async (header, roundNumber, api) => {
           fire2,
           fire2Human: value.toHuman().replace(/Unit$/, '').replace(' ', ''),
           prizeRatio: new Demical(fire2).div(accumulatedFire2Demical).toNumber(),
-          workerCount: 0
+          workerCount: 0,
+          payoutComputeReward: 0
         }
       }))
+
+  await Promise.all(
+    (await api.query.phalaModule.payoutComputeReward.keysAt(blockHash))
+      .map(async k => {
+        const account = k.args[0].toString()
+        const value = await api.rpc.state.getStorage(k, blockHash)
+        const payoutComputeReward = value.toNumber() || 0
+
+        if (!payoutAccounts[account]) { return }
+        payoutAccounts[account] = {
+          ...payoutAccounts[account],
+          payoutComputeReward
+        }
+      })
+  )
 
   const validStashAccounts = {}
   await Promise.all(
