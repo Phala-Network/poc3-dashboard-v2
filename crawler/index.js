@@ -9,6 +9,7 @@ import Koa from 'koa'
 const { default: Queue } = pQueue
 
 const ONE_THOUSAND = new BN('1000', 10)
+const ZERO = new BN('0')
 const WS_ENDPOINT = process.env.WS_ENDPOINT || 'wss://hashbox-lan.corp.phala.network/ws1'
 const HTTP_PORT = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3000
 
@@ -164,8 +165,9 @@ const processRoundAt = async (header, roundNumber, api) => {
         const payoutAccount = payoutAccounts[payout]
 
         if (!payoutAccount) { return }
+        if (!value) { return }
 
-        payoutAccount.stake = typeof payoutAccount.stake === 'undefined' ? value : value.add(value)
+        payoutAccount.stake = value.add(payoutAccount.stake || ZERO)
       })
   )
 
