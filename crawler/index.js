@@ -84,8 +84,10 @@ const processRoundAt = async (header, roundNumber, api) => {
   const totalPower = await api.query.phalaModule.totalPower.at(blockHash)
 
   const stashAccounts = {}
+  const stashKeys = await api.query.phalaModule.stashState.keysAt(blockHash)
+  const stashCount = stashKeys.length
   await Promise.all(
-    (await api.query.phalaModule.stashState.keysAt(blockHash))
+    (stashKeys)
       .map(async k => {
         const stash = k.args[0].toString()
         const value = (await api.rpc.state.getStorage(k, blockHash)).toJSON()
@@ -128,6 +130,7 @@ const processRoundAt = async (header, roundNumber, api) => {
   )
 
   const validStashAccounts = {}
+  let accumulatedScore = 0
   await Promise.all(
     (await api.query.phalaModule.workerState.keysAt(blockHash))
       .map(async k => {
@@ -136,6 +139,7 @@ const processRoundAt = async (header, roundNumber, api) => {
         const value = (await api.rpc.state.getStorage(k, blockHash)).toJSON()
 
         if (typeof value.state.Mining === 'undefined') { return }
+        accumulatedScore += value.score.overallScore
 
         validStashAccounts[stash] = stashAccounts[stash]
 
@@ -182,6 +186,13 @@ const processRoundAt = async (header, roundNumber, api) => {
     payoutAccounts[k].stakeRatio = valueDemical.div(accumulatedStakeDemical).toNumber()
   })
 
+  const avgStakeDemical = accumulatedStakeDemical.div(stashCount)
+  const avgStake = avgStakeDemical
+    .div(1000)
+    .div(1000)
+    .div(1000)
+    .div(1000)
+
   const output = {
     roundNumber,
     updatedAt: Date.now(),
@@ -191,7 +202,11 @@ const processRoundAt = async (header, roundNumber, api) => {
     accumulatedStake: accumulatedStake.toString(),
     accumulatedStakeHuman: api.createType('BalanceOf', accumulatedStake).toHuman().replace(/Unit$/, '').replace(' ', '').trim(),
     stashAccounts: validStashAccounts,
-    payoutAccounts
+    payoutAccounts,
+    stashCount,
+    avgStakeDemical,
+    avgStake: parseFloat(avgStake),
+    avgScore: accumulatedScore / onlineWorkers.toNumber()
   }
   jsonOutput = JSON.stringify(output)
   $logger.info(`Updated output from round #${roundNumber}.`)
