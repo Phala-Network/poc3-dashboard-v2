@@ -107,7 +107,7 @@ const processRoundAt = async (header, roundNumber, api) => {
         payoutAccounts[account] = {
           ...payoutAccounts[account],
           fire2,
-          fire2Human: value.toHuman().replace(/Unit$/, '').replace(' ', ''),
+          fire2Human: value.toHuman().replace(/PHA$/, '').replace(' ', ''),
           prizeRatio: new Demical(fire2).div(accumulatedFire2Demical).toNumber(),
           workerCount: 0,
           payoutComputeReward: 0
@@ -182,7 +182,7 @@ const processRoundAt = async (header, roundNumber, api) => {
     const valueDemical = new Demical(value.toString())
 
     payoutAccounts[k].stake = value.toString()
-    payoutAccounts[k].stakeHuman = api.createType('BalanceOf', payoutAccounts[k].stake).toHuman().replace(/Unit$/, '').replace(' ', '').trim()
+    payoutAccounts[k].stakeHuman = api.createType('BalanceOf', payoutAccounts[k].stake).toHuman().replace(/PHA$/, '').replace(' ', '').trim()
     payoutAccounts[k].stakeRatio = valueDemical.div(accumulatedStakeDemical).toNumber()
   })
 
@@ -200,7 +200,7 @@ const processRoundAt = async (header, roundNumber, api) => {
     onlineWorkers: onlineWorkers.toString(),
     totalPower: totalPower.toString(),
     accumulatedStake: accumulatedStake.toString(),
-    accumulatedStakeHuman: api.createType('BalanceOf', accumulatedStake).toHuman().replace(/Unit$/, '').replace(' ', '').trim(),
+    accumulatedStakeHuman: api.createType('BalanceOf', accumulatedStake).toHuman().replace(/PHA$/, '').replace(' ', '').trim(),
     stashAccounts: validStashAccounts,
     payoutAccounts,
     stashCount,
