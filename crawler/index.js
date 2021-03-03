@@ -10,6 +10,9 @@ const { default: Queue } = pQueue
 
 const ONE_THOUSAND = new BN('1000', 10)
 const ZERO = new BN('0')
+const LAST_BLOCK = 1304000
+const LAST_ROUND = 2181
+const DEFAULT_OUTPUT = 'null'
 const WS_ENDPOINT = process.env.WS_ENDPOINT || 'wss://hashbox-lan.corp.phala.network/ws1'
 const HTTP_PORT = process.env.HTTP_PORT ? parseInt(process.env.HTTP_PORT) : 3000
 
@@ -24,7 +27,8 @@ globalThis.$logger = createLogger({
   name: 'dashboard'
 })
 
-let jsonOutput = 'null'
+let jsonOutput = DEFAULT_OUTPUT
+let lastBlockHeader
 
 const main = async () => {
   const provider = new WsProvider(WS_ENDPOINT)
@@ -43,6 +47,15 @@ const main = async () => {
 
   return api.rpc.chain.subscribeNewHeads(async header => {
     const number = header.number.toNumber()
+
+    if (number > LAST_BLOCK) {
+      if (jsonOutput !== DEFAULT_OUTPUT) { return }
+      if (!lastBlockHeader) {
+        const lastBlockHeaderHash = await api.rpc.chain.getBlockHash(LAST_BLOCK)
+        lastBlockHeader = await api.rpc.chain.getHeader(lastBlockHeaderHash)
+      }
+      return queue.add(() => processRoundAt(lastBlockHeader, LAST_ROUND, api).catch(console.error))
+    }
 
     if (number === roundStartAt) {
       return queue.add(() => processRoundAt(header, currentRound, api).catch(console.error))
